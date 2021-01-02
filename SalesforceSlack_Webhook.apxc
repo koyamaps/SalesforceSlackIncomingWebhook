@@ -1,0 +1,60 @@
+public class SalesforceSlack_Webhook {
+    public class slackContent {
+        @InvocableVariable(label='Slack Webhook URL' required=true)
+        public String webhookURL;
+        @InvocableVariable(label='Channel Name or User Id' required=true)
+        public String channel;
+        @InvocableVariable(label='Emoji' required=true)
+        public String emoji;
+        @InvocableVariable(label='Post User Name' required=true)
+        public String username;
+        @InvocableVariable(label='Slack Text Message' required=true)
+        public String slackText;
+        @InvocableVariable(label='Slack Webhook Blocks')
+        public String slackBlocks;
+    }
+    @InvocableMethod(label='Send messages using Income Webhooks')
+    public static void postToSlack(List<slackContent> requests) {
+        for(slackContent r:requests){
+            JSONGenerator gen = JSON.createGenerator(true);
+            gen.writeStartObject(); //Inserts {
+            if (r.username != null) {
+                gen.writeStringField('username',  r.username );
+            }
+            if (r.channel != null) {
+                gen.writeStringField('channel', r.channel);
+            }
+            if (r.emoji != null) {
+                gen.writeStringField('emoji', ':' + r.emoji + ':');
+            }
+            if (r.slackText != null) {
+                gen.writeStringField('text', r.slackText);
+            }
+            if (r.slackBlocks !=null) {
+                gen.writeStringField('blocks', r.slackBlocks);
+            }
+            gen.writeEndObject();
+            String body = gen.getAsString();
+            System.debug(body);
+            System.enqueueJob(new qCallOut(r.webhookURL, 'POST', body));
+        } 
+    }
+    public class qCallOut implements System.Queueable, Database.AllowsCallouts {
+        private final String url;
+        private final String method;
+        private final String body;
+        public qCallOut(String url, String method, String body) {
+            this.url = url;
+            this.method = method;
+            this.body = body;
+        }
+        public void execute(System.QueueableContext ctx) {
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(url);
+            req.setMethod(method);
+            req.setBody(body);
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+        }
+    }
+}
