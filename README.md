@@ -8,8 +8,6 @@ It is very easy to use. Since the code coverage is already 100%, you just need t
 
 Also, although this Apex class is designed to be used in both Flow Action and Process Builder, we recommend using it in Process Builder.
 
-Translated with www.DeepL.com/Translator (free version)
-
 ## Disclaimer
 
 The author is not responsible for any damage, including information leakage, that may occur by using this source code. The safety of the source code can be used at the user's discretion.
