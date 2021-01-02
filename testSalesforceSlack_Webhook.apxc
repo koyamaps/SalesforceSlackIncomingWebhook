@@ -1,0 +1,27 @@
+@isTest(seeAllData=true)
+
+public class testSalesforceSlack_Webhook {
+    
+    static testmethod void testPostToSlack(){
+        Test.setMock(HttpCalloutMock.class,new  mockCallout());
+        List<SalesforceSlack_Webhook.slackContent> requests = new List<SalesforceSlack_Webhook.slackContent>();
+        SalesforceSlack_Webhook.slackContent r = new SalesforceSlack_Webhook.slackContent();
+        r.webhookURL='https://example.com/services/XXXXXXX';
+        r.channel='hoge';
+        r.username='hoge';
+        r.emoji=':emoji:';
+        r.slackText='hoge hgoe hoge';
+        r.slackBlocks='json contents';
+        requests.add(r);
+        SalesforceSlack_Webhook.postToSlack(requests);
+    }
+    public class mockCallout implements HttpCalloutMock{
+        public HttpResponse respond(HttpRequest request){
+            HttpResponse res=new HttpResponse();
+            res.setBody('{"text":"value"}');
+            res.setStatusCode(200);
+            return res;
+        }
+    }
+
+}
